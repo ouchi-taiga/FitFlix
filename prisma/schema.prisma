@@ -12,3 +12,45 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id            Int         @id @default(autoincrement())
+  name          String
+  email         String      @unique
+  password      String
+  setting       Setting?
+  favorites     Favorite[]
+  history       History[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Setting {
+  id            Int         @id @default(autoincrement())
+  user          User        @relation(fields: [userId], references: [id])
+  userId        Int         @unique
+  theme         String      @default("light")   // "light" or "dark"
+  language      String      @default("ja")      //  多言語対応
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Favorite {
+  id            Int           @id @default(autoincrement())
+  user          User          @relation(fields: [userId], references: [id])
+  userId        Int           @unique
+  youtubeId     String        //Youtubeの動画のID
+  title         String
+  thumbnailUrl  String
+  channelName   String
+  addedAt       DateTime      @default(now())
+}
+
+model History {
+  id            Int           @id @default(autoincrement())
+  user          User          @relation(fields: [userId], references: [id])
+  userId        Int           @unique
+  youtubeId     String
+  lastWatchedAt DateTime      @default(now())
+  progress      Int           @default(0)     //視聴途中の秒数
+}
